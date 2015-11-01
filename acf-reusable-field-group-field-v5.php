@@ -220,7 +220,7 @@
 			$this->replaced_keys = array();
 			unset($group['ID']);
 			$this->new_field_groups[] = $group;
-			if (is_local_field_group($group_key)) {
+			if (acf_is_local_field_group($group_key)) {
 				acf_remove_local_fields($group_key);
 				unset(acf_local()->groups[$group_key]);
 			}
