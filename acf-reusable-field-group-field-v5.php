@@ -149,9 +149,10 @@
 		}
 		
 		function get_field_group_choices() {
+			// function taken from https://github.com/tybruffy/ACF-Reusable-Field-Group
 			global $post;
 			$groups = acf_get_field_groups();
-			$r      = array();
+			$r = array();
 			$current_id = is_object( $post ) ? $post->ID : $_POST['parent'];
 			$current_group = _acf_get_field_group_by_id($current_id);
 			foreach( $groups as $group ) {
@@ -171,6 +172,7 @@
 					All acf field groups are loaded
 					The fields of the field groups are inspected to find resusable groups
 					if reusable groups are found then the field groups are rebuilt as local field groups
+							and these replace the existing field groups
 			*/
 			$this->get_acf_field_groups();
 			if (!count($this->field_groups)) {
