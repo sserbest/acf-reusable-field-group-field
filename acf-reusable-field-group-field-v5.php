@@ -370,8 +370,8 @@
 		} // end function scan_group_fields
 			
 		function replace_keys($array) {
-			// this is called after the copy process to replace the altered field keys
-			// in things like coditional logic and such
+			// this is called after the copy process to replace 
+			// altered field keys in conditional logic and such
 			// this is a recuresive function
 			$copied_array = array();
 			if (count($array)) {
@@ -381,6 +381,7 @@
 						$copied_array[$key] = $this->replace_keys($value);
 					} else {
 						if (isset($this->replaced_keys[$value])) {
+							// replace field key value
 							$value = $this->replaced_keys[$value];
 						}
 						$copied_array[$key] = $value;
@@ -393,7 +394,7 @@
 		}
 		
 		function acf_location_rules_types($choices) {
-			//echo '<pre>'; print_r($choices); die;
+			// add a new group called special
 			if (!isset($choices['Special'])) {
 				$choices['Special'] = array('special' => 'Special');
 			}
@@ -401,6 +402,7 @@
 		}
 		
 		function acf_location_rules_values_special($choices) {
+			// add a nowhere choice
 			if (!isset($choices['nowhere'])) {
 				$choices['nowhere'] = 'Nowhere (operator ignored)';
 			}
@@ -408,6 +410,7 @@
 		}
 		
 		function acf_location_rules_match_nowhere($match, $rule, $options) {
+			// always returns false so that field group is never shown
 			return false;
 		}
 		
@@ -416,7 +419,7 @@
 				<div class="error">
 					<p>
 						<strong>
-							<?php _e('ERROR! Infinite Loop Detected in Reusable Field Groups!', 'acf-reusable_field_group_field'); ?>
+							<?php _e('ERROR! Infinite Loop Detected in Reusable Field Groups!<br />Operation Aborted!', 'acf-reusable_field_group_field'); ?>
 						</strong>
 					</p>
 				</div>
