@@ -22,7 +22,7 @@
 			// field groups are added before it runs
 			add_action('acf/include_fields', array($this, 'build_field_groups'), 99);
 			
-			// add custom location rules for reusable group
+			// add custom location rule (nowhere) for reusable group
 			add_filter('acf/location/rule_types', array($this, 'acf_location_rules_types'));
 			add_filter('acf/location/rule_values/special', array($this, 'acf_location_rules_values_special'));
 			add_filter('acf/location/rule_match/nowhere', 'acf_location_rules_match_nowhere', 10, 3);
@@ -58,13 +58,15 @@
 		function render_field_settings( $field ) {
 			$message = '';
 			$message .= '<span class="acf-error-message"><p>';
-			$message .= __('Warning: It is possible to create an infinite loop by resuing field groups if resused groups create a circular reference.', 'acf-reusable_field_group_field');
+			$message .= __('Warning: It is possible to create an infinite loop by reusing field groups if resused groups create a circular reference.', 'acf-reusable_field_group_field');
 			$message .= '</p></span><p style="margin-bottom: 0;">';
 			$message .= __('The field name of this field will prefix all top level field names of the reused fields.', 'acf-reusable_field_group_field');
 			$message .= '<br />';
 			$message .= __('Example', 'acf-reusable_field_group_field');
 			$message .= ':</p><pre style="margin-top: 0; background-color: #EEE; padding: .5em;">';
-			$message .= __('  This Field Name = "reusable_field"<br />Reused Field Name = "text_field"', 'acf-reusable_field_group_field');
+			$message .= __('  This Field Name = "reusable_field"', 'acf-reusable_field_group_field');
+			$message .= '<br />';
+			$message .= __('Reused Field Name = "text_field"', 'acf-reusable_field_group_field');
 			$message .= '<br />';
 			$message .= __('   New Field Name = "reusable_field_text_field"', 'acf-reusable_field_group_field');
 			$message .= '</pre><p style="margin-bottom: 0;">';
@@ -87,7 +89,7 @@
 			$message .= '</p>';
 			
 			acf_render_field_setting( $field, array(
-				'label'			=> __('Instructions','acf-reusable_field_group_field'),
+				'label'			=> __('Instructions', 'acf-reusable_field_group_field'),
 				'instructions'	=> '',
 				'type'			=> 'message',
 				'message'		=> $message,
@@ -95,7 +97,7 @@
 			));
 			
 			acf_render_field_setting( $field, array(
-				'label'			=> __('Field Group','acf-reusable_field_group_field'),
+				'label'			=> __('Field Group', 'acf-reusable_field_group_field'),
 				'instructions'	=> 'Select the Field Group to Reuse',
 				'type'			=> 'select',
 				'name'			=> 'group_key',
@@ -103,12 +105,12 @@
 				'multiple'		=> 0,
 				'ui'			=> 1,
 				'allow_null'	=> 0,
-				'placeholder'	=> __("No Field Group",'acf-reusable_field_group_field'),
+				'placeholder'	=> __("No Field Group", 'acf-reusable_field_group_field'),
 			));
-		
+			
 			// layout
 			acf_render_field_setting( $field, array(
-				'label'			=> __('Field Name Prefixing','acf-reusable_field_group_field'),
+				'label'			=> __('Field Name Prefixing', 'acf-reusable_field_group_field'),
 				'instructions'	=> '',
 				'type'			=> 'radio',
 				'name'			=> 'name_prefix',
@@ -118,8 +120,7 @@
 					0	=> __("No",'acf-reusable_field_group_field')
 				)
 			));
-		
-			// layout
+			
 			acf_render_field_setting( $field, array(
 				'label'			=> __('Field Key Prefixing','acf-reusable_field_group_field'),
 				'instructions'	=> '',
@@ -131,8 +132,7 @@
 					0	=> __("No",'acf-reusable_field_group_field')
 				)
 			));
-		
-			// layout
+			
 			acf_render_field_setting( $field, array(
 				'label'			=> __('Field Label Prefixing','acf-reusable_field_group_field'),
 				'instructions'	=> 'Add the label of this field as a prefix to the labels of reused fields.',
@@ -145,11 +145,10 @@
 				)
 			));
 			
-			
 		}
 		
 		function get_field_group_choices() {
-			// function taken from https://github.com/tybruffy/ACF-Reusable-Field-Group
+			// function taken from https://github.com/tybruffy/ACF-Reusable-Field-Group, thank you
 			global $post;
 			$groups = acf_get_field_groups();
 			$r = array();
@@ -178,7 +177,6 @@
 			if (!count($this->field_groups)) {
 				return;
 			}
-			//echo '<pre>'; print_r($this->field_groups); die;
 			foreach ($this->field_groups as $group_key => $group) {
 				$this->scan_group_fields($group_key, $group['fields']);
 			}
@@ -187,7 +185,7 @@
 			while (count($this->groups)) {
 				// make sure count of groups continues to go down
 				if ($iterations > 0 && $current_count == count($this->groups)) {
-					// infinite loop in reuseable field groups
+					// infinite loop in reuseable field groups detected
 					add_action('admin_notices', array($this, 'infinite_loop_message'));
 					return;
 				}
@@ -197,6 +195,8 @@
 					if (count($sub_groups)) {
 						foreach ($sub_groups as $sub_group) {
 							if (isset($this->groups[$sub_group])) {
+								// subgroup is also a parent group
+								// need to rebuild that one first
 								$rebuild = false;
 								break;
 							}
@@ -205,30 +205,33 @@
 					if ($rebuild) {
 						$this->rebuild_group($group_key);
 						unset($this->groups[$group_key]);
+						// break to restart while loop
 						break;
 					}
 				} // end foreach
 				$iterations++;
 			} // end while
-			//echo '<pre>'; print_r($this->new_field_groups); die;
 		}
 		
 		function rebuild_group($group_key) {
 			$group = $this->field_groups[$group_key];
 			$group['fields'] = $this->rebuild_fields($group_key, $group['fields']);
 			$group['fields'] = $this->replace_keys($group['fields']);
-			$this->replaced_keys = array();
 			unset($group['ID']);
 			$this->new_field_groups[] = $group;
 			if (acf_is_local_field_group($group_key)) {
+				// this is already a local field group
+				// remove the existing version before replacing
 				acf_remove_local_fields($group_key);
+				// there currently isn't a remove group function in acf_local
 				unset(acf_local()->groups[$group_key]);
 			}
-			// *************************************************************************************
+			// add or replace the field group to local groups
 			acf_add_local_field_group($group);
 		}
 		
 		function rebuild_fields($parent, $fields, $parent_key='', $parent_name='', $logic='', $parent_label='') {
+			// this is a rucusive function
 			$new_fields = array();
 			if (!count($fields)) {
 				return $new_fields;
@@ -238,7 +241,6 @@
 					if (!$field['conditional_logic']) {
 						$field['conditional_logic'] = $logic;
 					} else {
-						//$logic = $logic[0];
 						$new_logic = array();
 						foreach ($field['conditional_logic'] as $field_logic) {
 							foreach ($logic as $add_logic) {
@@ -265,7 +267,7 @@
 						$field['name'] = $parent_name.'_'.$field['name'];
 					}
 					$this->replaced_keys[$old_key] = $field['key'];
-					//$this->replaced_keys[$old_name] = $field['name'];
+					// unset anything that may cause a problem when adding local group
 					$unsets = array('ID', '_name', '_valid', 'parent');
 					foreach ($unsets as $unset) {
 						if (isset($field[$unset])) {
@@ -275,9 +277,16 @@
 					$new_name = '';
 					$new_parent = $field['key'];
 					$sub_fields = false;
-					if (isset($field['sub_fields']) && is_array($field['sub_fields']) && count($field['sub_fields'])) {
-						//echo '<br>$field[\'sub_fields\'](',$field['sub_fields'],')<br>';
-						$field['sub_fields'] = $this->rebuild_fields($new_parent, $field['sub_fields'], $parent_key, $new_name);
+					if (isset($field['sub_fields']) && 
+							is_array($field['sub_fields']) && 
+							count($field['sub_fields'])) {
+						// recursive call to add subfields of a reeater or flex field
+						$field['sub_fields'] = $this->rebuild_fields(
+							$new_parent,
+							$field['sub_fields'],
+							$parent_key,
+							$new_name
+						);
 					}
 					$new_fields[] = $field;
 				} else {
@@ -292,8 +301,8 @@
 					}
 					$sub_fields = false;
 					if ($field['group_key']) {
+						// get the field list from the reused field group
 						$sub_fields = $this->field_groups[$field['group_key']]['fields'];
-						//echo '<br>here(',$sub_fields,')<br>';
 					}
 					if ($field['name_prefix']) {
 						$new_name = $field['name'];
@@ -310,10 +319,20 @@
 						$label = $field['label'];
 					}
 					if ($sub_fields) {
-						$new_fields = array_merge($new_fields, 
-													$this->rebuild_fields($new_parent, $sub_fields, $new_key, $new_name, $new_logic, $label));
-					}
-				}
+						// recursive call to merge reused fields into group
+						$new_fields = array_merge(
+							$new_fields, 
+							$this->rebuild_fields(
+								$new_parent,
+								$sub_fields,
+								$new_key,
+								$new_name,
+								$new_logic,
+								$label
+							)
+						);
+					} // end if sub fields
+				} // if ! reusable else
 			} // end foreach $fields;
 			return $new_fields;
 		} // end function rebuild_fields
@@ -329,6 +348,7 @@
 		}
 		
 		function scan_group_fields($group, $fields) {
+			// recursive function
 			if (!count($fields)) {
 				return;
 			}
@@ -340,9 +360,14 @@
 					if ($field['group_key'] != '') {
 						$this->groups[$group][] = $field['group_key'];
 					}
-				}
-			}
-		}
+					if (isset($field['sub_fields']) &&
+							is_array($field['sub_fields'])) {
+						// recursive calle
+						$this->scan_group_fields($group, $field['sub_fields']);
+					}
+				} // end if is reusable
+			} // end foreach $field
+		} // end function scan_group_fields
 			
 		function replace_keys($array) {
 			// this is called after the copy process to replace the altered field keys
@@ -362,6 +387,8 @@
 					} // end if else
 				} // end foreach field
 			} // end if count fields
+			// reset keys that need to be replaced
+			$this->replaced_keys = array();
 			return $copied_array;
 		}
 		
