@@ -287,7 +287,23 @@
 							$parent_key,
 							$new_name
 						);
-					}
+					} elseif (isset($field['layouts']) &&
+										is_array($field['layouts']) &&
+										count($field['layouts'])) {
+						foreach ($field['layouts'] as $index => $layout) {
+							if (isset($layout['sub_fields']) &&
+									is_array($layout['sub_fields']) &&
+									count($layout['sub_fields'])) {
+								$layout['sub_fields'] = $this->rebuild_fields(
+									$new_parent,
+									$layout['sub_fields'],
+									$parent_key,
+									$new_name
+								);
+								$field['layouts'][$index] = $layout;
+							} // end if layouts
+						} // end each layout
+					} // end if subfields elsif layouts
 					$new_fields[] = $field;
 				} else {
 					// reusable field
@@ -364,6 +380,9 @@
 							is_array($field['sub_fields'])) {
 						// recursive calle
 						$this->scan_group_fields($group, $field['sub_fields']);
+					} elseif (isset($field['layouts']) &&
+										is_array($field['layouts'])) {
+						$this->scan_group_fields($group, $field['layouts']);
 					}
 				} // end if is reusable
 			} // end foreach $field
