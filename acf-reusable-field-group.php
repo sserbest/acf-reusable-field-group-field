@@ -11,8 +11,6 @@
 		License URI: http://www.gnu.org/licenses/gpl-2.0.html
 	*/
 	
-	//require(dirname(__FILE__).'/test.php');
-	
 	load_plugin_textdomain('acf-reusable-field-group-field', false, dirname(plugin_basename(__FILE__)).'/lang/'); 
 	
 	// 2. Include field type for ACF5
