@@ -16,6 +16,7 @@
 	// 2. Include field type for ACF5
 	// $version = 5 and can be ignored until ACF6 exists
 	function include_field_types_reusable_field_group_field($version) {
+		//echo 'here'; die;
 		include_once('acf-reusable-field-group-field-v5.php');
 	}
 	add_action('acf/include_field_types', 'include_field_types_reusable_field_group_field');	
