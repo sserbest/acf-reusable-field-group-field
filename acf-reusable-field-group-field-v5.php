@@ -217,6 +217,7 @@
 			$group = $this->field_groups[$group_key];
 			$group['fields'] = $this->rebuild_fields($group_key, $group['fields']);
 			$group['fields'] = $this->replace_keys($group['fields']);
+			$this->replaced_keys = array();
 			unset($group['ID']);
 			$this->new_field_groups[] = $group;
 			if (acf_is_local_field_group($group_key)) {
@@ -408,7 +409,6 @@
 				} // end foreach field
 			} // end if count fields
 			// reset keys that need to be replaced
-			$this->replaced_keys = array();
 			return $copied_array;
 		}
 		
