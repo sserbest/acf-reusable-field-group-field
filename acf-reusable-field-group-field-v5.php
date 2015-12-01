@@ -219,6 +219,7 @@
 			$group['fields'] = $this->replace_keys($group['fields']);
 			$this->replaced_keys = array();
 			unset($group['ID']);
+			$this->field_groups[$group_key] = $group;
 			$this->new_field_groups[] = $group;
 			if (acf_is_local_field_group($group_key)) {
 				// this is already a local field group
