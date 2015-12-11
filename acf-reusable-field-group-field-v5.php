@@ -208,7 +208,7 @@
 			// do not run if on certain pages
 			// exporting fields
 			global $pagenow;
-			if ($pagenow == 'edit.php' && isset($_POST['generate']) && isset($_POST['acf_export_keys'])) {
+			if ($pagenow == 'edit.php' && (isset($_POST['generate']) || isset($_POST['download'])) && isset($_POST['acf_export_keys'])) {
 				return;
 			}
 			
