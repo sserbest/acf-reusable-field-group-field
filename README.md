@@ -1,5 +1,5 @@
 # Reusable Field Group Field for ACF Pro
-Version 0.1.0
+Version 0.1.1
 
 ## How it works
 Field groups are rebuilt using local field groups that override existing field groups.
