@@ -303,7 +303,7 @@
 			// attempt to save file
 			if (!$json_found && is_dir($json_path)) {
 				if (($handle = @fopen($json_path.'/'.$group_key.'.json', 'w')) !== false) {
-					$json = json_encode($group);
+					$json = acf_json_encode($group);
 					fwrite($handle, $json, strlen($json));
 					fclose($handle);
 				}

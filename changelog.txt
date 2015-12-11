@@ -1,5 +1,8 @@
 Change Log
 
+== 0.1.2 ==
+* use acf_json_encode for local json to make more readable
+
 == 0.1.1 == 
 * Corrected problem that prevented ACF export of field groups
 
