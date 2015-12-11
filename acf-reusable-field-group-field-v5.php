@@ -204,6 +204,14 @@
 					if reusable groups are found then the field groups are rebuilt as local field groups
 							and these replace the existing field groups
 			*/
+			
+			// do not run if on certain pages
+			// exporting fields
+			global $pagenow;
+			if ($pagenow == 'edit.php' && isset($_POST['generate']) && isset($_POST['acf_export_keys'])) {
+				return;
+			}
+			
 			$this->get_acf_field_groups();
 			if (!count($this->field_groups)) {
 				return;
