@@ -27,10 +27,39 @@
 			add_filter('acf/location/rule_values/special', array($this, 'acf_location_rules_values_special'));
 			add_filter('acf/location/rule_match/nowhere', 'acf_location_rules_match_nowhere', 10, 3);
 			
+			add_action('save_post', array($this, 'save_post'));
+			
 			// do not delete!
 			parent::__construct();
 				
 		}
+		
+		function save_post($post_id) {
+			if (get_post_type($post_id) != 'acf-field-group') {
+				return;
+			}
+			// delete all local json files
+			$json_path = plugin_dir_path(__FILE__).'acf-json';
+			if (is_dir($json_path) && 
+					($files = scandir($json_path)) !== false &&
+					count($files)) {
+				foreach ($files as $file) {
+					$file_path = $json_path.'/'.$file;
+					if (!is_dir($file_path) && preg_match('/\.json$/', $file)) {
+						@unlink($file_path);
+					} // end if json file
+				} // end foreach field
+			} // end if is dire etc
+			// delete all cache values just in case someone is using a persistent cache
+			global $wp_object_cache;
+			$group = 'acf_resuable';
+			if (isset($wp_object_cache->cache[$group])) {
+				$cache = $wp_object_cache->cache[$group];
+				foreach ($cache as $key => $value) {
+					wp_cache_delete($key, $group);
+				}
+			}
+		} // end function save_post
 		
 		function field_group_admin_head() {
 			?>
@@ -152,7 +181,9 @@
 			global $post;
 			$groups = acf_get_field_groups();
 			$r = array();
-			$current_id = is_object( $post ) ? $post->ID : $_POST['parent'];
+			if (isset($post->ID)) {
+				$current_id = $post->ID;
+			}
 			$current_group = _acf_get_field_group_by_id($current_id);
 			foreach( $groups as $group ) {
 				$key = $group["key"];
@@ -177,8 +208,15 @@
 			if (!count($this->field_groups)) {
 				return;
 			}
-			foreach ($this->field_groups as $group_key => $group) {
-				$this->scan_group_fields($group_key, $group['fields']);
+			$found = false;
+			$cache = wp_cache_get('acf_resulable/scanned_groups', 'acf_resuable', false, $found);
+			if ($found) {
+				$this->groups = $cache;
+			} else {
+				foreach ($this->field_groups as $group_key => $group) {
+					$this->scan_group_fields($group_key, $group['fields']);
+				}
+				wp_cache_set('acf_resulable/scanned_groups', $this->groups, 'acf_resuable');
 			}
 			$current_count = count($this->groups);
 			$iterations = 0;
@@ -214,12 +252,60 @@
 		}
 		
 		function rebuild_group($group_key) {
-			$group = $this->field_groups[$group_key];
-			$group['fields'] = $this->rebuild_fields($group_key, $group['fields']);
-			$group['fields'] = $this->replace_keys($group['fields']);
-			$this->replaced_keys = array();
-			unset($group['ID']);
+			
+			// check for group in cache
+			$found = false;
+			$cache = wp_cache_get('acf_resulable/rebuilt_group_'.$group_key, 'acf_resuable', false, $found);
+			if ($found) {
+				$group = $cache;
+			}
+			// check for json field
+			$json_found = false;
+			if (!$found) {
+				$json_path = plugin_dir_path(__FILE__).'acf-json';
+				if (is_dir($json_path) && 
+						($files = scandir($json_path)) !== false &&
+						count($files)) {
+					foreach ($files as $file) {
+						$file_path = $json_path.'/'.$file;
+						if (!is_dir($file_path) && preg_match('/\.json$/', $file)) {
+							$file_group_key = preg_replace('/\.json$/', '', $file);
+							if ($file_group_key == $group_key) {
+								if (($json = file_get_contents($file_path)) !== false &&
+										($group = json_decode($json, true)) !== NULL) {
+									$json_found = true;
+									$found = true;
+								}
+							} // end if match
+						} // end if json file
+					} // end foreach file
+				} // end if is_dir etc
+			} // end if !found
+			
+			// neither found the rebuild group
+			if (!$found) {
+				$group = $this->field_groups[$group_key];
+				$group['fields'] = $this->rebuild_fields($group_key, $group['fields']);
+				$group['fields'] = $this->replace_keys($group['fields']);
+				$this->replaced_keys = array();
+				unset($group['ID']);
+			}
+			
+			// if json files was not found then save json file
+			// attempt to save file
+			if (!$json_found && is_dir($json_path)) {
+				if (($handle = @fopen($json_path.'/'.$group_key.'.json', 'w')) !== false) {
+					$json = json_encode($group);
+					fwrite($handle, $json, strlen($json));
+					fclose($handle);
+				}
+			} // end if !json found
+			
+			// save in cache
+			wp_cache_set('acf_resulable/rebuilt_group_'.$group_key, $group, 'acf_resuable');
+			
 			$this->field_groups[$group_key] = $group;
+			
 			$this->new_field_groups[] = $group;
 			if (acf_is_local_field_group($group_key)) {
 				// this is already a local field group
@@ -356,6 +442,11 @@
 		} // end function rebuild_fields
 		
 		function get_acf_field_groups() {
+			$found = false;
+			$cache = wp_cache_get('acf_resulable/acf_field_groups', 'acf_resuable', false, $found);
+			if ($found) {
+				$this->field_groups = $cache;
+			}
 			$field_groups = acf_get_field_groups();
 			$count = count($field_groups);
 			for ($i=0; $i<$count; $i++) {
@@ -363,6 +454,7 @@
 				$field_groups[$i]['fields'] = $fields;
 				$this->field_groups[$field_groups[$i]['key']] = $field_groups[$i];
 			}
+			wp_cache_set('acf_resulable/acf_field_groups', $this->field_groups, 'acf_resuable');
 		}
 		
 		function scan_group_fields($group, $fields) {
