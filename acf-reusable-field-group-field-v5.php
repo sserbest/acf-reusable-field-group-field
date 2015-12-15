@@ -6,6 +6,7 @@
 		var $field_groups = array(); // to hold all field groups for processing
 		var $new_field_groups = array(); // to hold fieilds after rebuilding for testing
 		var $replaced_keys = array(); // field keys that need to be replaced for conditional logic
+		var $unique_replace = 0;
 		
 		function __construct() {
 			$this->name = 'reusable_field_group_field';
@@ -295,6 +296,9 @@
 				$group = $this->field_groups[$group_key];
 				$group['fields'] = $this->rebuild_fields($group_key, $group['fields']);
 				$group['fields'] = $this->replace_keys($group['fields']);
+				$group['fields'] = $this->correct_keys($group['fields']);
+				//echo preg_replace('/\_\[[0-9]+\]\_/', '', 'field_566f61991b2c4_566f60e177211_[1]_');die;
+				//echo '<pre>'; print_r($group['fields']); die;
 				$this->replaced_keys = array();
 				unset($group['ID']);
 			}
@@ -324,6 +328,63 @@
 			}
 			// add or replace the field group to local groups
 			acf_add_local_field_group($group);
+		}
+		
+		function correct_keys($array) {
+			$new_array = array();
+			if (count($array)) {
+				foreach ($array as $key => $value) {
+					if (is_array($value)) {
+						$new_array[$key] = $this->correct_keys($value);
+					} else {
+						if (substr($value, 0, 6) == 'field_') {
+							$value = preg_replace('/\_\[[0-9]+\]\_/', '', $value);
+						}
+						$new_array[$key] = $value;
+					} // end if array else
+				} // end foreach
+			} // end if count
+			return $new_array;
+		} // end function correct_keys
+		
+		function key_pre_replace($array) {
+			$new_array = array();
+			if (count($array)) {
+				foreach ($array as $key => $value) {
+					if (is_array($value)) {
+						$new_array[$key] = $this->key_pre_replace($value);
+					} else {
+						if (substr($value, 0, 6) == 'field_') {
+							$value .= '_['.$this->unique_replace.']_';
+						}
+						$new_array[$key] = $value;
+					} // end if array else
+				} // end foreach 
+			} // end if count
+			return $new_array;
+		} // end function key_pre_replace
+			
+		function replace_keys($array) {
+			// this is called after the copy process to replace 
+			// altered field keys in conditional logic and such
+			// this is a recuresive function
+			$copied_array = array();
+			if (count($array)) {
+				foreach ($array as $key => $value) {
+					if (is_array($value)) {
+						// recursive call here
+						$copied_array[$key] = $this->replace_keys($value);
+					} else {
+						if (isset($this->replaced_keys[$value])) {
+							// replace field key value
+							$value = $this->replaced_keys[$value];
+						}
+						$copied_array[$key] = $value;
+					} // end if else
+				} // end foreach field
+			} // end if count fields
+			// reset keys that need to be replaced
+			return $copied_array;
 		}
 		
 		function rebuild_fields($parent, $fields, $parent_key='', $parent_name='', $logic='', $parent_label='') {
@@ -414,7 +475,10 @@
 					$sub_fields = false;
 					if ($field['group_key']) {
 						// get the field list from the reused field group
-						$sub_fields = $this->field_groups[$field['group_key']]['fields'];
+						$this->unique_replace++;
+						$sub_fields = $this->key_pre_replace($this->field_groups[$field['group_key']]['fields']);
+						//echo '<pre>'; print_r($sub_fields); die;
+						//$sub_fields = $this->field_groups[$field['group_key']]['fields'];
 					}
 					if ($field['name_prefix']) {
 						$new_name = $field['name'];
@@ -489,29 +553,6 @@
 				} // end if is reusable
 			} // end foreach $field
 		} // end function scan_group_fields
-			
-		function replace_keys($array) {
-			// this is called after the copy process to replace 
-			// altered field keys in conditional logic and such
-			// this is a recuresive function
-			$copied_array = array();
-			if (count($array)) {
-				foreach ($array as $key => $value) {
-					if (is_array($value)) {
-						// recursive call here
-						$copied_array[$key] = $this->replace_keys($value);
-					} else {
-						if (isset($this->replaced_keys[$value])) {
-							// replace field key value
-							$value = $this->replaced_keys[$value];
-						}
-						$copied_array[$key] = $value;
-					} // end if else
-				} // end foreach field
-			} // end if count fields
-			// reset keys that need to be replaced
-			return $copied_array;
-		}
 		
 		function acf_location_rules_types($choices) {
 			// add a new group called special

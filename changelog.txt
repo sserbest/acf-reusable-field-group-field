@@ -1,5 +1,8 @@
 Change Log
 
+== 1.2.3 ==
+* corrected bug in conditional logic, key replacement, unique replacement when group is reused multiple times at the same level
+
 == 0.1.2 ==
 * use acf_json_encode for local json to make more readable
 
