@@ -218,14 +218,14 @@
 				return;
 			}
 			$found = false;
-			$cache = wp_cache_get('acf_resulable/scanned_groups', 'acf_resuable', false, $found);
+			$cache = wp_cache_get('acf_reusable/scanned_groups', 'acf_resuable', false, $found);
 			if ($found) {
 				$this->groups = $cache;
 			} else {
 				foreach ($this->field_groups as $group_key => $group) {
 					$this->scan_group_fields($group_key, $group['fields']);
 				}
-				wp_cache_set('acf_resulable/scanned_groups', $this->groups, 'acf_resuable');
+				wp_cache_set('acf_reusable/scanned_groups', $this->groups, 'acf_resuable');
 			}
 			$current_count = count($this->groups);
 			$iterations = 0;
@@ -264,7 +264,7 @@
 			
 			// check for group in cache
 			$found = false;
-			$cache = wp_cache_get('acf_resulable/rebuilt_group_'.$group_key, 'acf_resuable', false, $found);
+			$cache = wp_cache_get('acf_reusable/rebuilt_group_'.$group_key, 'acf_resuable', false, $found);
 			if ($found) {
 				$group = $cache;
 			}
@@ -314,7 +314,7 @@
 			} // end if !json found
 			
 			// save in cache
-			wp_cache_set('acf_resulable/rebuilt_group_'.$group_key, $group, 'acf_resuable');
+			wp_cache_set('acf_reusable/rebuilt_group_'.$group_key, $group, 'acf_resuable');
 			
 			$this->field_groups[$group_key] = $group;
 			
@@ -521,7 +521,7 @@
 		
 		function get_acf_field_groups() {
 			$found = false;
-			$cache = wp_cache_get('acf_resulable/acf_field_groups', 'acf_resuable', false, $found);
+			$cache = wp_cache_get('acf_reusable/acf_field_groups', 'acf_resuable', false, $found);
 			if ($found) {
 				$this->field_groups = $cache;
 			}
@@ -532,7 +532,7 @@
 				$field_groups[$i]['fields'] = $fields;
 				$this->field_groups[$field_groups[$i]['key']] = $field_groups[$i];
 			}
-			wp_cache_set('acf_resulable/acf_field_groups', $this->field_groups, 'acf_resuable');
+			wp_cache_set('acf_reusable/acf_field_groups', $this->field_groups, 'acf_resuable');
 		}
 		
 		function scan_group_fields($group, $fields) {
