@@ -209,7 +209,15 @@
 			// do not run if on certain pages
 			// exporting fields
 			global $pagenow;
-			if ($pagenow == 'edit.php' && (isset($_POST['generate']) || isset($_POST['download'])) && isset($_POST['acf_export_keys'])) {
+			//echo '<pre>'; print_r($pagenow); die;
+			if (is_admin() && $pagenow == 'edit.php' && (isset($_POST['generate']) || isset($_POST['download'])) && isset($_POST['acf_export_keys'])) {
+				return;
+			}
+			// do not run if on an ACF edit page
+			if (is_admin() && $pagenow == 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] == 'acf-field-group') {
+				return;
+			}
+			if (is_admin() && $pagenow == 'post.php' && isset($_GET['post']) && get_post_type(intval($_GET['post'])) == 'acf-field-group') {
 				return;
 			}
 			
@@ -543,20 +551,18 @@
 				return;
 			}
 			foreach ($fields as $field) {
-				if ($field['type'] == 'reusable_field_group_field') {
+				if (isset($field['type']) && $field['type'] == 'reusable_field_group_field') {
 					if (!isset($this->groups[$group])) {
 						$this->groups[$group] = array();
 					}
-					if ($field['group_key'] != '') {
+					if (isset($field['group_key']) && $field['group_key'] != '') {
 						$this->groups[$group][] = $field['group_key'];
 					}
 				} // end if reusable field
-				if (isset($field['sub_fields']) &&
-						is_array($field['sub_fields'])) {
+				if (isset($field['sub_fields']) && is_array($field['sub_fields'])) {
 					// recursive calls
 					$this->scan_group_fields($group, $field['sub_fields']);
-				} elseif (isset($field['layouts']) &&
-									is_array($field['layouts'])) {
+				} elseif (isset($field['layouts']) && is_array($field['layouts'])) {
 					$this->scan_group_fields($group, $field['layouts']);
 				}
 			} // end foreach $field
