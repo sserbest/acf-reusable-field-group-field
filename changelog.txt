@@ -1,5 +1,9 @@
 Change Log
 
+== 0.1.5 ==
+* added clearing of acf's cached values to correct interference when using functions acf_get_field_groups() and acf_get_fields()
+* store values retrieved from the above functions in local json to avoid using these function unless necessary
+
 == 0.1.4 ==
 * corrected bug causing reusable groups to not work in repeaters and flex fields
 * corrected undefined index warning
