@@ -331,6 +331,9 @@
 		}
 		
 		function correct_keys($array) {
+			// this corrects what was done in key_pre_replace
+			// after the key replacement phase to correct
+			// conditional logic is complete
 			$new_array = array();
 			if (count($array)) {
 				foreach ($array as $key => $value) {
@@ -348,6 +351,9 @@
 		} // end function correct_keys
 		
 		function key_pre_replace($array) {
+			// this replaces keys in a group that is reused
+			// so that they are unique for conditional logic 
+			// key replacement phase
 			$new_array = array();
 			if (count($array)) {
 				foreach ($array as $key => $value) {
@@ -531,6 +537,8 @@
 		
 		function scan_group_fields($group, $fields) {
 			// recursive function
+			// search the fields of the groups for reusable groups
+			// put them in a queue to be rebuilt
 			if (!count($fields)) {
 				return;
 			}
@@ -542,15 +550,15 @@
 					if ($field['group_key'] != '') {
 						$this->groups[$group][] = $field['group_key'];
 					}
-					if (isset($field['sub_fields']) &&
-							is_array($field['sub_fields'])) {
-						// recursive calle
-						$this->scan_group_fields($group, $field['sub_fields']);
-					} elseif (isset($field['layouts']) &&
-										is_array($field['layouts'])) {
-						$this->scan_group_fields($group, $field['layouts']);
-					}
-				} // end if is reusable
+				} // end if reusable field
+				if (isset($field['sub_fields']) &&
+						is_array($field['sub_fields'])) {
+					// recursive calls
+					$this->scan_group_fields($group, $field['sub_fields']);
+				} elseif (isset($field['layouts']) &&
+									is_array($field['layouts'])) {
+					$this->scan_group_fields($group, $field['layouts']);
+				}
 			} // end foreach $field
 		} // end function scan_group_fields
 		
