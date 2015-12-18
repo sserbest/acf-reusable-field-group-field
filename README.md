@@ -53,5 +53,8 @@ and keys will be prefixed again, for example `resuable_field_reusable_field_text
 `field_56351aa7271b7_56351ab9271b8_56351ac768a9`. Care should be taken with compound resusable field groups so
 that you do not exceed any limitations of field names that may be imposed by the database, for example option_name in the options table.
 
+### Local JSON
+Like ACF, this plugin uses Local JSON to improve performance. The plugin includes it's own acf-json folder. To take advantage of this feature this folder must be writeable by PHP.
+
 ### Bugs, Problems?
 [Please let me know in if you have any problems with this plugin working.](https://github.com/Hube2/acf-reusable-field-group-field/issues)
