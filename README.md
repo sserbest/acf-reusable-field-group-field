@@ -56,5 +56,8 @@ that you do not exceed any limitations of field names that may be imposed by the
 ### Local JSON
 Like ACF, this plugin uses Local JSON to improve performance. The plugin includes it's own acf-json folder. To take advantage of this feature this folder must be writeable by PHP.
 
-### Bugs, Problems?
+### Bugs, Problems, Questions?
 [Please let me know in if you have any problems with this plugin working.](https://github.com/Hube2/acf-reusable-field-group-field/issues)
+If you have questions about how to do something, please do not email me to ask them.
+[Please post them in issues instead](https://github.com/Hube2/acf-reusable-field-group-field/issues), 
+I will handle support here on GitHub.
