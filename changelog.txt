@@ -1,7 +1,10 @@
 Change Log
 
+== 0.1.7 ==
+* Corrected undefined variable error causing ACF AJAX request to fail due to PHP error 
+
 == 0.1.6 ==
-* Corrected undefinded varialble error
+* Corrected undefinded variable error
 
 == 0.1.5 ==
 * added clearing of acf's cached values to correct interference when using functions acf_get_field_groups() and acf_get_fields()

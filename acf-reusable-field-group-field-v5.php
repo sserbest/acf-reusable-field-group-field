@@ -182,6 +182,7 @@
 			global $post;
 			$groups = acf_get_field_groups();
 			$r = array();
+			$current_id = 0;
 			if (isset($post->ID)) {
 				$current_id = $post->ID;
 			}
