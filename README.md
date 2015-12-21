@@ -64,13 +64,13 @@ field group then you can probably turn off feild key prefixing.
 2) When the field group will always be used as a repeatable field group. This one is more difficult 
 to explain. There are two possibilities depending on what you're doing.
 
-* Top Level Field Group (turn off field key indexing here)
-  * Resusable Field Group w/nested Reusable Field Groups (field prefixing turned on here)
-	  * Nested Reusable Field Group
+*Top Level Field Group (turn off field key indexing here)
+  *Resusable Field Group w/nested Reusable Field Groups (field prefixing turned on here)
+	  *Nested Reusable Field Group
 
-* Top Level Field Group (field prefixing turned on here)
-  * Resusable Field Group w/nested Reusable Field Groups (turn off field key indexing here)
-	  * Nested Reusable Field Group
+*Top Level Field Group (field prefixing turned on here)
+  *Resusable Field Group w/nested Reusable Field Groups (turn off field key indexing here)
+	  *Nested Reusable Field Group
 
 The reason that either of these will work is because all of the fields in the nested field group will have 
 unique field keys due to the fact that field key prefixing is active for at least one level of the nesting.
