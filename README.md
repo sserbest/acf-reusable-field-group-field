@@ -42,7 +42,7 @@ The name of the resusable field group field will prefix each of the fields in th
 
 1) Field Name Prefixing can safely be turned off when creating a reusable field group field in a repeater field.
 
-2) Field Name Prefixing can be turned off it the same field is only used once outside of a repeter field.
+2) Field Name Prefixing can be turned off it the same field group is only used once outside of a repeter field.
 
 #### Field Key Prefixing
 
