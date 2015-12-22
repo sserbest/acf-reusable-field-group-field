@@ -36,13 +36,7 @@ The following is a basic outline of how the field names and field keys are renam
 Let's say that you create a field in a field group that you want to reuse and you name this field `text_field`.
 In another group you create a resuable field group field and you name this field `reusable_group`. The new name
 of the text field, and the name you will need to use in all ACF functions will be `reusable_group_text_field`.
-The name of the resusable field group field will prefix each of the fields in the resused field group.
-
-#####When is it safe to turn off Field Name prefixing?
-
-1) Field Name Prefixing can safely be turned off when creating a reusable field group field in a repeater field.
-
-2) Field Name Prefixing can be turned off it the same field group is only used once outside of a repeter field.
+The name of the resusable field group field will prefix each of the fields in the resused field group..
 
 #### Field Key Prefixing
 
@@ -52,26 +46,6 @@ key will be `field_56351aa7271b7_56351ab9271b8`. ACF field keys must begin with 
 section of the new key is the unique ID from the reusable field group key with an added underscore 
 `56351aa7271b7_` and the last section of the new key is the unique ID from the field in the group 
 that is being reused `56351ab9271b8`.
-
-#####When is it safe to turn off Field Key prefixing?
-
-There are two cases that I can think of that Field Key prefixing
-
-1) When the field group that is being reused is used only a single time anywhere in the group that it's
-beeing reused in. This means that if you never create more than on reusable field group field in a
-field group then you can probably turn off feild key prefixing.
-
-2) When the field group will always be used as a repeatable field group. This one is more difficult 
-to explain. There are two possibilities depending on what you're doing.
-* Top Level Field Group (turn off field key indexing here)
-  * Resusable Field Group w/nested Reusable Field Groups (field prefixing turned on here)
-	  * Nested Reusable Field Group
-* Top Level Field Group (field prefixing turned on here)
-  * Resusable Field Group w/nested Reusable Field Groups (turn off field key indexing here)
-	  * Nested Reusable Field Group
-
-The reason that either of these will work is because all of the fields in the nested field group will have 
-unique field keys due to the fact that field key prefixing is active for at least one level of the nesting.
 
 #### Compound Field Names and Keys
 It is posssible to reuse a field group that included resusable field group fields. In this case the field names
