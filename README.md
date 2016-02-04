@@ -53,6 +53,9 @@ and keys will be prefixed again, for example `resuable_field_reusable_field_text
 `field_56351aa7271b7_56351ab9271b8_56351ac768a9`. Care should be taken with compound resusable field groups so
 that you do not exceed any limitations of field names that may be imposed by the database, for example option_name in the options table.
 
+#### When Can You Turn Off Field Name/Key Prefixing?
+Field name and field key prefixing is not always needed. It really depends on where and how you'll be reusing field groups. See [the comment I made on this issue](https://github.com/Hube2/acf-reusable-field-group-field/issues/15#issuecomment-180020166). Understanding where and when it can be turned off requires an understanding of how ACF stores data for custom fields.
+
 ### Local JSON
 Like ACF, this plugin uses Local JSON to improve performance. The plugin includes it's own acf-json folder. To take advantage of this feature this folder must be writeable by PHP.
 
