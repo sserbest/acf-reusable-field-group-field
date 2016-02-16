@@ -540,7 +540,7 @@
 				$object_path = $json_path.'/acf_field_groups.json';
 				if (is_dir($json_path) && 
 						file_exists($object_path) &&
-						($json = file_get_contents($json_path)) !== false &&
+						($json = file_get_contents($object_path)) !== false &&
 						($object = json_decode($json, true)) !== NULL) {
 					$this->field_groups = $object;
 					return;
