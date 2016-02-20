@@ -1,6 +1,10 @@
 # Reusable Field Group Field for ACF Pro
 Version 0.1.7
 
+***Currently, this plugin may not safe to use on multisite. It is possible that the cached field groups
+created on one site can effect the field groups on other sites. This can happen if there are field
+groups with the same group key but having different field makeups exist on mulitple sites.***
+
 ## How it works
 Field groups are rebuilt using local field groups that override existing field groups.
 
