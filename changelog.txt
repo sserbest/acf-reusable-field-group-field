@@ -1,5 +1,9 @@
 Change Log
 
+== 0.2.0 ==
+* Added support for multisite, store local JSON files in site sub folders.
+* Corrected some caching issues
+
 == 0.1.7 ==
 * Corrected undefined variable error causing ACF AJAX request to fail due to PHP error 
 
