@@ -41,6 +41,15 @@
 			}
 			// delete all local json files
 			$json_path = plugin_dir_path(__FILE__).'acf-json';
+			if (!is_dir($json_path)) {
+				@mkdir($json_path);
+			}
+			if (is_multisite()) {
+				$json_path .= '/'.get_current_blog_id();
+				if (!is_dir($json_path)) {
+					@mkdir($json_path);
+				}
+			}
 			if (is_dir($json_path) && 
 					($files = scandir($json_path)) !== false &&
 					count($files)) {
@@ -281,6 +290,15 @@
 			$json_found = false;
 			if (!$found) {
 				$json_path = plugin_dir_path(__FILE__).'acf-json';
+				if (!is_dir($json_path)) {
+					@mkdir($json_path);
+				}
+				if (is_multisite()) {
+					$json_path .= '/'.get_current_blog_id();
+					if (!is_dir($json_path)) {
+						@mkdir($json_path);
+					}
+				}
 				if (is_dir($json_path) && 
 						($files = scandir($json_path)) !== false &&
 						count($files)) {
@@ -544,6 +562,15 @@
 			} else {
 				// look in acf-json
 				$json_path = plugin_dir_path(__FILE__).'acf-json';
+				if (!is_dir($json_path)) {
+					@mkdir($json_path);
+				}
+				if (is_multisite()) {
+					$json_path .= '/'.get_current_blog_id();
+					if (!is_dir($json_path)) {
+						@mkdir($json_path);
+					}
+				}
 				$object_path = $json_path.'/acf_field_groups.json';
 				if (is_dir($json_path) && file_exists($object_path)) {
 					$json = @file_get_contents($object_path);
@@ -566,6 +593,15 @@
 			wp_cache_set('acf_reusable/acf_field_groups', $this->field_groups, 'acf_resuable');
 			// store json file to avoid using acf_get_field_groups unless necessary
 			$json_path = plugin_dir_path(__FILE__).'acf-json';
+			if (!is_dir($json_path)) {
+				@mkdir($json_path);
+			}
+			if (is_multisite()) {
+				$json_path .= '/'.get_current_blog_id();
+				if (!is_dir($json_path)) {
+					@mkdir($json_path);
+				}
+			}
 			if (($handle = @fopen($json_path.'/acf_field_groups.json', 'w')) !== false) {
 				$json = json_encode($this->field_groups);
 				fwrite($handle, $json, strlen($json));
