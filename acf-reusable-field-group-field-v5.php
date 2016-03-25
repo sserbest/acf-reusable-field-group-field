@@ -21,7 +21,7 @@
 			
 			// this action is run with a very high priority to make sure that all
 			// field groups are added before it runs
-			add_action('acf/include_fields', array($this, 'build_field_groups'), 99);
+			add_action('acf/include_fields', array($this, 'build_field_groups'), 999);
 			
 			// add custom location rule (nowhere) for reusable group
 			add_filter('acf/location/rule_types', array($this, 'acf_location_rules_types'));
@@ -333,10 +333,17 @@
 				// remove the existing version before replacing
 				acf_remove_local_fields($group_key);
 				// there currently isn't a remove group function in acf_local
-				unset(acf_local()->groups[$group_key]);
+				//echo $group_key,'<br>';
+				$this->clear_acf_cache();
+				$acf_local = acf_local();
+				unset($acf_local->groups[$group_key]);
+				//echo '<pre>'; print_r($acf_local->groups); die;
+				//unset(acf_local()->groups[$group_key]);
 			}
+			//echo '<pre>'; print_r($group); die;
 			// add or replace the field group to local groups
 			acf_add_local_field_group($group);
+			//echo $group_key,'<br><pre>'; print_r(acf_get_field_groups()); die;
 		}
 		
 		function correct_keys($array) {
@@ -538,11 +545,14 @@
 				// look in acf-json
 				$json_path = plugin_dir_path(__FILE__).'acf-json';
 				$object_path = $json_path.'/acf_field_groups.json';
-				if (is_dir($json_path) && 
-						file_exists($object_path) &&
-						($json = file_get_contents($object_path)) !== false &&
-						($object = json_decode($json, true)) !== NULL) {
-					$this->field_groups = $object;
+				if (is_dir($json_path) && file_exists($object_path)) {
+					$json = @file_get_contents($object_path);
+					if ($json !== false) {
+						$object = json_decode($json, true);
+						if ($object !== NULL) {
+							$this->field_groups = $object;
+						}
+					}
 					return;
 				} // end if is_dir etc
 			} // end if else
