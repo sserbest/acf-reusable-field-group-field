@@ -1,5 +1,8 @@
 Change Log
 
+== 0.2.1 ==
+* Improved performance - early loading of local JSON - no rebuilding of fields groups if local JSON files exist
+
 == 0.2.0 ==
 * Added support for multisite, store local JSON files in site sub folders.
 * Corrected some caching issues

@@ -1,16 +1,5 @@
 # Reusable Field Group Field for ACF Pro
-Version 0.2.0
-
-## ***I Do Not Recommend Using This Plugin On Production Sites***
-Here is what I suggest. That you use this plugin for building field groups with reusable field groups on
-in a development environment. Once you have completed development then you should go to the acf-json folder
-of this plugin and you should use field groups json files that you find there and import the completed field groups into the live site. If you keep the dev site you can always make edits there and then reimport the
-groups to the live site. The reason that I suggest this is that in order to register the new field groups
-created by this plugin it must wipe out the ACF cache of field groups and fields. This cashe clearing will
-cause additional database requests and file requests if you are using local JSON in ACF. This means that
-using this plugin ***Will*** slow down your site. If your site only has a couple ACF field groups it may
-not be noticable, but if you have a site with many field groups there will likely be a noticalbe effect
-on site speed.
+Version 0.2.1
 
 ## How it works
 Field groups are rebuilt using local field groups that override existing field groups.
