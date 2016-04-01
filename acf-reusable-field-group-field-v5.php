@@ -7,6 +7,7 @@
 		var $new_field_groups = array(); // to hold fieilds after rebuilding for testing
 		var $replaced_keys = array(); // field keys that need to be replaced for conditional logic
 		var $unique_replace = 0;
+		var $local_loaded = false;
 		
 		function __construct() {
 			$this->name = 'reusable_field_group_field';
@@ -21,6 +22,7 @@
 			
 			// this action is run with a very high priority to make sure that all
 			// field groups are added before it runs
+			add_action('acf/include_fields', array($this, 'maybe_load_local'), -1); // before ACF
 			add_action('acf/include_fields', array($this, 'build_field_groups'), 999);
 			
 			// add custom location rule (nowhere) for reusable group
@@ -34,6 +36,57 @@
 			parent::__construct();
 				
 		}
+		
+		function should_run() {
+			// do not run if on certain pages
+			// exporting fields
+			global $pagenow;
+			//echo '<pre>'; print_r($pagenow); die;
+			if (is_admin() && $pagenow == 'edit.php' && (isset($_POST['generate']) || isset($_POST['download'])) && isset($_POST['acf_export_keys'])) {
+				return false;
+			}
+			// do not run if on an ACF edit page
+			if (is_admin() && $pagenow == 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] == 'acf-field-group') {
+				return false;
+			}
+			if (is_admin() && $pagenow == 'post.php' && isset($_GET['post']) && get_post_type(intval($_GET['post'])) == 'acf-field-group') {
+				return false;
+			}
+			return true;
+		} // end function should_run
+		
+		function maybe_load_local() {
+			// if local json files exist then load them
+			if (!$this->should_run()) {
+				return;
+			}
+			$json_path = plugin_dir_path(__FILE__).'acf-json';
+			if (!is_dir($json_path)) {
+				// json folder does not exist
+				return;
+			}
+			if (is_multisite()) {
+				$json_path .= '/'.get_current_blog_id();
+				if (!is_dir($json_path)) {
+					// json folder does not exist
+					return;
+				}
+			}
+			if (is_dir($json_path) && 
+					($files = scandir($json_path)) !== false &&
+					count($files)) {
+				foreach ($files as $file) {
+					$file_path = $json_path.'/'.$file;
+					if (!is_dir($file_path) && preg_match('/^group_.*\.json$/', $file)) {
+						if (($json = file_get_contents($file_path)) !== false &&
+								($group = json_decode($json, true)) !== NULL) {
+							acf_add_local_field_group($group);
+							$this->local_loaded = true;
+						}
+					} // end if json file
+				} // end foreach file
+			} // end if is_dir etc
+		} // end function maybe_load_local
 		
 		function save_post($post_id) {
 			if (get_post_type($post_id) != 'acf-field-group') {
@@ -208,6 +261,12 @@
 		}
 		
 		function build_field_groups() {
+			if ($this->local_loaded) {
+				// rebuilt field groups already loaded
+				// from local JSON files
+				// no need to go through the rebuild
+				return;
+			}
 			/*
 					How this works
 					All acf field groups are loaded
@@ -216,18 +275,7 @@
 							and these replace the existing field groups
 			*/
 			
-			// do not run if on certain pages
-			// exporting fields
-			global $pagenow;
-			//echo '<pre>'; print_r($pagenow); die;
-			if (is_admin() && $pagenow == 'edit.php' && (isset($_POST['generate']) || isset($_POST['download'])) && isset($_POST['acf_export_keys'])) {
-				return;
-			}
-			// do not run if on an ACF edit page
-			if (is_admin() && $pagenow == 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] == 'acf-field-group') {
-				return;
-			}
-			if (is_admin() && $pagenow == 'post.php' && isset($_GET['post']) && get_post_type(intval($_GET['post'])) == 'acf-field-group') {
+			if (!$this->should_run()) {
 				return;
 			}
 			
@@ -288,6 +336,11 @@
 			}
 			// check for json field
 			$json_found = false;
+			/*
+			// no need to check local groups because 
+			// if they existed they would have been loaded by maybe_load_local
+			// and we would not be here
+			// will remove this code if the early loading of local json files works
 			if (!$found) {
 				$json_path = plugin_dir_path(__FILE__).'acf-json';
 				if (!is_dir($json_path)) {
@@ -317,7 +370,7 @@
 					} // end foreach file
 				} // end if is_dir etc
 			} // end if !found
-			
+			*/
 			// neither found the rebuild group
 			if (!$found) {
 				$group = $this->field_groups[$group_key];
@@ -330,8 +383,20 @@
 				unset($group['ID']);
 			}
 			
+			// make sure json path exists
+			$json_path = plugin_dir_path(__FILE__).'acf-json';
+			if (!is_dir($json_path)) {
+				@mkdir($json_path);
+			}
+			if (is_multisite()) {
+				$json_path .= '/'.get_current_blog_id();
+				if (!is_dir($json_path)) {
+					@mkdir($json_path);
+				}
+			}
+			
 			// if json files was not found then save json file
-			// attempt to save file
+			// attempt to save file/ silently fail if folder is not writable
 			if (!$json_found && is_dir($json_path)) {
 				if (($handle = @fopen($json_path.'/'.$group_key.'.json', 'w')) !== false) {
 					$json = acf_json_encode($group);
@@ -382,7 +447,7 @@
 				} // end foreach
 			} // end if count
 			return $new_array;
-		} // end function correct_keys
+		}
 		
 		function key_pre_replace($array) {
 			// this replaces keys in a group that is reused
@@ -402,7 +467,7 @@
 				} // end foreach 
 			} // end if count
 			return $new_array;
-		} // end function key_pre_replace
+		}
 			
 		function replace_keys($array) {
 			// this is called after the copy process to replace 
@@ -608,7 +673,7 @@
 				fclose($handle);
 			}
 			$this->clear_acf_cache();
-		} // end get_acf_field_groups
+		}
 		
 		function clear_acf_cache($fields=false) {
 			global $wp_object_cache;
@@ -620,7 +685,7 @@
 					wp_cache_delete($key, $group);
 				}
 			}
-		} // end function clear_acf_cache
+		}
 		
 		function scan_group_fields($group, $fields) {
 			// recursive function
@@ -645,7 +710,7 @@
 					$this->scan_group_fields($group, $field['layouts']);
 				}
 			} // end foreach $field
-		} // end function scan_group_fields
+		}
 		
 		function acf_location_rules_types($choices) {
 			// add a new group called special
