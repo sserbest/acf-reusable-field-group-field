@@ -32,9 +32,70 @@
 			
 			add_action('save_post', array($this, 'save_post'));
 			
+			add_action('acf/render_field', array($this, 'render_field'));
+			add_action('admin_head', array($this, 'admin_head'));
+			
 			// do not delete!
 			parent::__construct();
 				
+		}
+		
+		function admin_head() {
+			if (!acf_current_user_can_admin()) {
+				return;
+			}
+			?>
+				<script type="text/javascript">
+					jQuery(document).ready(function($){
+						var $append = '';
+						$append += '<span class="acf-field-details">';
+						$append += '<span class="show-field-details dashicons dashicons-info" data-action="show-field-details" onclick="show_field_details(this);"></span>';
+						$append += '<span class="acf-field-details-block" style="clear: both; display:none"></span>';
+						$append += '</span>';
+						$('.acf-field .acf-label label').append($append);
+					});
+					function show_field_details(e) {
+						//alert(e);
+						var $visible = e.style.visibility;
+						var $details = e.nextSibling;
+						//alert($details);
+						if (!$visible) {
+							e.style.visibility = 'visible';
+							$details.style.display = 'block';
+							var $html = $details.innerHTML;
+							if (!$html) {
+								var $container = e.closest('.acf-field');
+								var $key = $container.getAttribute('data-key');
+								var $name = $container.getAttribute('data-name');
+								$html += '<span>'+$key+'</span>';
+								$html += '<span>'+$name+'</span>';
+								$details.innerHTML = $html;
+							}
+						} else {
+							e.style.visibility = '';
+							$details.style.display = 'none';
+						}
+					}
+				</script>
+				<style type="text/css">
+					.show-field-details {
+						font-weight: normal;
+						float: right;
+						visibility: hidden;
+						color: #AAA;
+					}
+					.acf-field .acf-label label:hover .show-field-details {
+						visibility: visible;
+					}
+					.acf-field-details-block {
+						font-weight: normal;
+					}
+					.acf-field-details-block>span {
+						display: block;
+						text-align: right;
+					}
+				</style>
+			<?php 
 		}
 		
 		function should_run() {
