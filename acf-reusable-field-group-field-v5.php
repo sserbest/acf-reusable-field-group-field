@@ -32,7 +32,7 @@
 			
 			add_action('save_post', array($this, 'save_post'));
 			
-			add_action('acf/render_field', array($this, 'render_field'));
+			//add_action('acf/render_field', array($this, 'render_field'));
 			add_action('admin_head', array($this, 'admin_head'));
 			
 			// do not delete!
@@ -150,7 +150,8 @@
 		} // end function maybe_load_local
 		
 		function save_post($post_id) {
-			if (get_post_type($post_id) != 'acf-field-group') {
+			$post_type = get_post_type($post_id);
+			if ($post_type != 'acf-field-group' && $post_type != 'acf-field') {
 				return;
 			}
 			// delete all local json files
@@ -776,7 +777,10 @@
 		function acf_location_rules_types($choices) {
 			// add a new group called special
 			if (!isset($choices['Special'])) {
-				$choices['Special'] = array('special' => 'Special');
+				$choices['Special'] = array();
+			}
+			if (!isset($choices['Special']['special'])) {
+				$choices['Special']['special'] = 'Special';
 			}
 			return $choices;
 		}

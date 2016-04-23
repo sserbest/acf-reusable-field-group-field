@@ -1,5 +1,9 @@
 Change Log
 
+== 0.3.1 ==
+* Corrected location rules to not interfere with other special location rules
+* Added removal of local JSON files when saving acf-field post type
+
 == 0.3.0 ==
 * Added field info feature
 
