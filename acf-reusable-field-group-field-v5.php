@@ -48,11 +48,24 @@
 				<script type="text/javascript">
 					jQuery(document).ready(function($){
 						var $append = '';
+						
+						// most fields
+						$append = '';
 						$append += '<span class="acf-field-details">';
 						$append += '<span class="show-field-details dashicons dashicons-info" data-action="show-field-details" onclick="show_field_details(this);"></span>';
 						$append += '<span class="acf-field-details-block" style="clear: both; display:none"></span>';
 						$append += '</span>';
 						$('.acf-field .acf-label label').append($append);
+						
+						// repeater table
+						$append = '';
+						$append += '<span class="acf-field-details">';
+						$append += '<span class="show-field-details dashicons dashicons-info" data-action="show-field-details" onclick="show_field_details_repeater(this);"></span>';
+						$append += '<span class="acf-field-details-block" style="clear: both; display:none"></span>';
+						$append += '</span>';
+						$('.acf-field-repeater th.acf-th').append($append);
+						
+						
 					});
 					function show_field_details(e) {
 						//alert(e);
@@ -76,6 +89,28 @@
 							$details.style.display = 'none';
 						}
 					}
+					function show_field_details_repeater(e) {
+						var $visible = e.style.visibility;
+						var $details = e.nextSibling;
+						if (!$visible) {
+							e.style.visibility = 'visible';
+							$details.style.display = 'block';
+							var $html = $details.innerHTML;
+							if (!$html) {
+								var $container = e.closest('.acf-th');
+								var $key = $container.getAttribute('data-key');
+								var $inputs = jQuery('tr>td[data-key="'+$key+'"]');
+								var $input = $inputs[0];
+								var $name = $input.getAttribute('data-name');
+								$html += '<span>'+$key+'</span>';
+								$html += '<span>'+$name+'</span>';
+								$details.innerHTML = $html;
+							}
+						} else {
+							e.style.visibility = '';
+							$details.style.display = 'none';
+						}
+					}
 				</script>
 				<style type="text/css">
 					.show-field-details {
@@ -84,7 +119,8 @@
 						visibility: hidden;
 						color: #AAA;
 					}
-					.acf-field .acf-label label:hover .show-field-details {
+					.acf-field .acf-label label:hover .show-field-details,
+					.acf-field-repeater th.acf-th:hover .show-field-details {
 						visibility: visible;
 					}
 					.acf-field-details-block {

@@ -4,7 +4,7 @@
 		Plugin Name: Advanced Custom Fields: Reusable Field Group Field
 		Plugin URI: https://github.com/Hube2/acf-reusable-field-group-field
 		Description: Reuse Field Groups in Other Field Groups
-		Version: 0.3.1
+		Version: 0.3.2
 		Author: John Huebner
 		Author URI: https://github.com/Hube2
 		License: GPLv2 or later

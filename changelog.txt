@@ -1,5 +1,8 @@
 Change Log
 
+== 0.3.2 ==
+* Corrected field info feature on repeaters using table layout
+
 == 0.3.1 ==
 * Corrected location rules to not interfere with other special location rules
 * Added removal of local JSON files when saving acf-field post type
