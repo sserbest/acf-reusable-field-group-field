@@ -66,4 +66,7 @@ If you have questions about how to do something, please do not email me to ask t
 I will handle support here on GitHub.
 
 ### Donations
-If you find my work useful and you have a desire to send me money, which will give me an incentive to continue offering and maintaining the plugins I've made public in my many repositories, I'm not going to turn it down. You can send money through paypal to hube02[AT]earthlink[dot]net. 
+If you find my work useful and you have a desire to send me money, which will give me an incentive to continue
+offering and maintaining the plugins I've made public in my many repositories, I'm not going to turn it down
+and whatever you feel my work is worth will be greatly appreciated. You can send money through paypal to
+hube02[AT]earthlink[dot]net. 
