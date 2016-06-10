@@ -1,5 +1,8 @@
 Change Log
 
+== 0.3.3 ==
+* added composer.json - thanks [TheCognito](https://github.com/TheCognito)
+
 == 0.3.2 ==
 * Corrected field info feature on repeaters using table layout
 
