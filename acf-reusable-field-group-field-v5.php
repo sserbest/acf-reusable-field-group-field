@@ -31,6 +31,7 @@
 			add_filter('acf/location/rule_match/nowhere', 'acf_location_rules_match_nowhere', 10, 3);
 			
 			add_action('save_post', array($this, 'save_post'));
+			add_action('acf/update_field_group', array($this, 'clear_cache'));
 			
 			//add_action('acf/render_field', array($this, 'render_field'));
 			add_action('admin_head', array($this, 'admin_head'));
@@ -185,11 +186,7 @@
 			} // end if is_dir etc
 		} // end function maybe_load_local
 		
-		function save_post($post_id) {
-			$post_type = get_post_type($post_id);
-			if ($post_type != 'acf-field-group' && $post_type != 'acf-field') {
-				return;
-			}
+		function clear_cache() {
 			// delete all local json files
 			$json_path = plugin_dir_path(__FILE__).'acf-json';
 			if (!is_dir($json_path)) {
@@ -220,6 +217,14 @@
 					wp_cache_delete($key, $group);
 				}
 			}
+		} // end function clear_cache
+		
+		function save_post($post_id) {
+			$post_type = get_post_type($post_id);
+			if ($post_type != 'acf-field-group' && $post_type != 'acf-field') {
+				return;
+			}
+			$this->clear_cache();
 		} // end function save_post
 		
 		function field_group_admin_head() {

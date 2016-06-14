@@ -1,5 +1,8 @@
 Change Log
 
+== 0.3.4 ==
+* added additional trigger to clear json file cache when fields groups are inported into ACF
+
 == 0.3.3 ==
 * added composer.json - thanks [TheCognito](https://github.com/TheCognito)
 
