@@ -1,5 +1,10 @@
 # Reusable Field Group Field for ACF Pro
-Version 0.3.4 (see changelog.txt)
+Version 0.3.5 (see changelog.txt)
+
+## Important note before you decide to use this plugin
+***ACF Version 5.4 will include a new "Clone" field that should do almost everything that this add on does. If you need this functionality and you're not already using this plugin on a site then I strongly suggest that you wait until the this version of ACF Pro is released. This version of ACF is already available in Beta if you log into your account over on the ACF site. This plugin is not compatable with the new clone field and there will not be any way for you to transfer data from fields of this plugin to fields of the new pluging without an extreme amount of work.***
+
+***For those that are using this plugin and would like to attempt to move the data I would suggest looking at [WP All Import](http://www.wpallimport.com/). This plugin has an ACF add on that I think could be used to get the data transfered. My theory is that you can use the standard WP Export to export posts and then use WP All Import to update the existing posts moving that data from the fields uses in this plugin to the fields of the new clone field. But this is just a theory and it would need to be tested.***
 
 ## How it works
 Field groups are rebuilt using local field groups that override existing field groups.
