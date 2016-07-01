@@ -217,6 +217,9 @@
 					wp_cache_delete($key, $group);
 				}
 			}
+			if (class_exists('acf_cache')) {
+				acf_flush_cache();
+			}
 		} // end function clear_cache
 		
 		function save_post($post_id) {
@@ -787,6 +790,9 @@
 				foreach ($cache as $key => $value) {
 					wp_cache_delete($key, $group);
 				}
+			}
+			if (class_exists('acf_cache')) {
+				acf_flush_cache();
 			}
 		}
 		
