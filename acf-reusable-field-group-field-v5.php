@@ -155,6 +155,9 @@
 		
 		function maybe_load_local() {
 			// if local json files exist then load them
+			if (defined('ACF_REUSABLE_DISABLE_JSON') && ACF_REUSABLE_DISABLE_JSON) {
+				return;
+			}
 			if (!$this->should_run()) {
 				return;
 			}
@@ -442,41 +445,6 @@
 			}
 			// check for json field
 			$json_found = false;
-			/*
-			// no need to check local groups because 
-			// if they existed they would have been loaded by maybe_load_local
-			// and we would not be here
-			// will remove this code if the early loading of local json files works
-			if (!$found) {
-				$json_path = plugin_dir_path(__FILE__).'acf-json';
-				if (!is_dir($json_path)) {
-					@mkdir($json_path);
-				}
-				if (is_multisite()) {
-					$json_path .= '/'.get_current_blog_id();
-					if (!is_dir($json_path)) {
-						@mkdir($json_path);
-					}
-				}
-				if (is_dir($json_path) && 
-						($files = scandir($json_path)) !== false &&
-						count($files)) {
-					foreach ($files as $file) {
-						$file_path = $json_path.'/'.$file;
-						if (!is_dir($file_path) && preg_match('/\.json$/', $file)) {
-							$file_group_key = preg_replace('/\.json$/', '', $file);
-							if ($file_group_key == $group_key) {
-								if (($json = file_get_contents($file_path)) !== false &&
-										($group = json_decode($json, true)) !== NULL) {
-									$json_found = true;
-									$found = true;
-								}
-							} // end if match
-						} // end if json file
-					} // end foreach file
-				} // end if is_dir etc
-			} // end if !found
-			*/
 			// neither found the rebuild group
 			if (!$found) {
 				$group = $this->field_groups[$group_key];
@@ -489,27 +457,29 @@
 				unset($group['ID']);
 			}
 			
-			// make sure json path exists
-			$json_path = plugin_dir_path(__FILE__).'acf-json';
-			if (!is_dir($json_path)) {
-				@mkdir($json_path);
-			}
-			if (is_multisite()) {
-				$json_path .= '/'.get_current_blog_id();
+			if (!defined('ACF_REUSABLE_DISABLE_JSON') || !ACF_REUSABLE_DISABLE_JSON) {
+				// make sure json path exists
+				$json_path = plugin_dir_path(__FILE__).'acf-json';
 				if (!is_dir($json_path)) {
 					@mkdir($json_path);
 				}
-			}
-			
-			// if json files was not found then save json file
-			// attempt to save file/ silently fail if folder is not writable
-			if (!$json_found && is_dir($json_path)) {
-				if (($handle = @fopen($json_path.'/'.$group_key.'.json', 'w')) !== false) {
-					$json = acf_json_encode($group);
-					fwrite($handle, $json, strlen($json));
-					fclose($handle);
+				if (is_multisite()) {
+					$json_path .= '/'.get_current_blog_id();
+					if (!is_dir($json_path)) {
+						@mkdir($json_path);
+					}
 				}
-			} // end if !json found
+				
+				// if json files was not found then save json file
+				// attempt to save file/ silently fail if folder is not writable
+				if (!$json_found && is_dir($json_path)) {
+					if (($handle = @fopen($json_path.'/'.$group_key.'.json', 'w')) !== false) {
+						$json = acf_json_encode($group);
+						fwrite($handle, $json, strlen($json));
+						fclose($handle);
+					}
+				} // end if !json found
+			}
 			
 			// save in cache
 			wp_cache_set('acf_reusable/rebuilt_group_'.$group_key, $group, 'acf_resuable');
@@ -730,7 +700,7 @@
 			if ($found) {
 				$this->field_groups = $cache;
 				return;
-			} else {
+			} elseif (!defined('ACF_REUSABLE_DISABLE_JSON') || !ACF_REUSABLE_DISABLE_JSON) {
 				// look in acf-json
 				$json_path = plugin_dir_path(__FILE__).'acf-json';
 				if (!is_dir($json_path)) {
@@ -763,20 +733,22 @@
 			}
 			wp_cache_set('acf_reusable/acf_field_groups', $this->field_groups, 'acf_resuable');
 			// store json file to avoid using acf_get_field_groups unless necessary
-			$json_path = plugin_dir_path(__FILE__).'acf-json';
-			if (!is_dir($json_path)) {
-				@mkdir($json_path);
-			}
-			if (is_multisite()) {
-				$json_path .= '/'.get_current_blog_id();
+			if (!defined('ACF_REUSABLE_DISABLE_JSON') || !ACF_REUSABLE_DISABLE_JSON) {
+				$json_path = plugin_dir_path(__FILE__).'acf-json';
 				if (!is_dir($json_path)) {
 					@mkdir($json_path);
 				}
-			}
-			if (($handle = @fopen($json_path.'/acf_field_groups.json', 'w')) !== false) {
-				$json = json_encode($this->field_groups);
-				fwrite($handle, $json, strlen($json));
-				fclose($handle);
+				if (is_multisite()) {
+					$json_path .= '/'.get_current_blog_id();
+					if (!is_dir($json_path)) {
+						@mkdir($json_path);
+					}
+				}
+				if (($handle = @fopen($json_path.'/acf_field_groups.json', 'w')) !== false) {
+					$json = json_encode($this->field_groups);
+					fwrite($handle, $json, strlen($json));
+					fclose($handle);
+				}
 			}
 			$this->clear_acf_cache();
 		}
