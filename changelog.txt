@@ -1,5 +1,8 @@
 Change Log
 
+== 0.4.1 ==
+* Correcte fatal error undefined function acf_flush_cache()
+
 == 0.4.0 ==
 * Add configuration setting to disable saving of local JSON files
 

@@ -220,8 +220,8 @@
 					wp_cache_delete($key, $group);
 				}
 			}
-			if (class_exists('acf_cache')) {
-				acf_flush_cache();
+			if (class_exists('acf_cache') && function_exists('acf_delete_cache')) {
+				acf_delete_cache();
 			}
 		} // end function clear_cache
 		
@@ -763,8 +763,8 @@
 					wp_cache_delete($key, $group);
 				}
 			}
-			if (class_exists('acf_cache')) {
-				acf_flush_cache();
+			if (class_exists('acf_cache') && function_exists('acf_delete_cache')) {
+				acf_delete_cache();
 			}
 		}
 		
