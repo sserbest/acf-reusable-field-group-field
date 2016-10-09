@@ -847,6 +847,9 @@
 	new acf_field_reusable_field_group_field();
 	
 	if (!function_exists('jh_plugins_list_meta_box')) {
+		if (apply_filters('remove_hube2_nag', false)) {
+			return;
+		}
 		function jh_plugins_list_meta_box() {
 			$plugins = apply_filters('jh_plugins_list', array());
 				
