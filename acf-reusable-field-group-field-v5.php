@@ -92,8 +92,10 @@
 							var $html = $details.innerHTML;
 							if (!$html) {
 								var $container = e.closest('.acf-field');
+								var $type = $container.getAttribute('data-type');
 								var $key = $container.getAttribute('data-key');
 								var $name = $container.getAttribute('data-name');
+								$html += '<span>'+$type+'</span>';
 								$html += '<span>'+$key+'</span>';
 								$html += '<span>'+$name+'</span>';
 								$details.innerHTML = $html;
