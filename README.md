@@ -1,6 +1,8 @@
 # Reusable Field Group Field for ACF Pro
 Version 1.0.0 (see changelog.txt)
 
+# There is very little chance that this plugin still works with the current version of ACF. Is is only here for reference.
+
 ***This plugin has not been updated or maintained in some time. I recomment before using this to use the new Clone field, see below...***
 
 ## Important note before you decide to use this plugin
