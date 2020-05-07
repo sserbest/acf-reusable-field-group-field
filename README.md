@@ -1,3 +1,5 @@
+# NOTICE - To anyone still following this plguin. I will be deleting this plugin in the very near future. It is unmaintanable and unnecessary with the changes is ACF. If you want a copy of this then I suggest you make a fork before remove.
+
 # Reusable Field Group Field for ACF Pro
 Version 1.0.0 (see changelog.txt)
 
